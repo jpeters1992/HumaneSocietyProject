@@ -175,7 +175,13 @@ namespace HumaneSociety
                     UserInterface.DisplayEmployeeInfo(employee);
                     break;
                 case "update":
-                    //TODO
+                    Employee updatedEmployee = db.Employees.Where(e => e.EmployeeId == employee.EmployeeId).Single();
+                    updatedEmployee.FirstName = employee.FirstName;
+                    updatedEmployee.LastName = employee.LastName;
+                    updatedEmployee.UserName = employee.UserName;
+                    updatedEmployee.Password = employee.Password;
+                    updatedEmployee.Email = employee.Email;
+                    db.SubmitChanges();
                     break;
                 case "delete":
                     db.Employees.DeleteOnSubmit(employee);
