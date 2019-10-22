@@ -156,7 +156,6 @@ namespace HumaneSociety
         internal static bool CheckEmployeeUserNameExist(string userName)
         {
             Employee employeeWithUserName = db.Employees.Where(e => e.UserName == userName).FirstOrDefault();
-
             return employeeWithUserName == null;
         }
 
@@ -166,13 +165,32 @@ namespace HumaneSociety
         // TODO: Allow any of the CRUD operations to occur here
         internal static void RunEmployeeQueries(Employee employee, string crudOperation)
         {
-            throw new NotImplementedException();
+            switch (crudOperation)
+            {
+                case "create":
+                    db.Employees.InsertOnSubmit(employee);
+                    db.SubmitChanges();
+                    break;
+                case "read":
+                    UserInterface.DisplayEmployeeInfo(employee);
+                    break;
+                case "update":
+                    //TODO
+                    break;
+                case "delete":
+                    db.Employees.DeleteOnSubmit(employee);
+                    db.SubmitChanges();
+                    break;
+                default:
+                    break;
+            }
         }
 
         // TODO: Animal CRUD Operations
         internal static void AddAnimal(Animal animal)
         {
-            throw new NotImplementedException();
+            db.Animals.InsertOnSubmit(animal);
+            db.SubmitChanges();
         }
 
         internal static Animal GetAnimalByID(int id)

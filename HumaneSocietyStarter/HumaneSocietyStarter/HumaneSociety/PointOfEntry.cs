@@ -8,6 +8,7 @@ namespace HumaneSociety
 {
     public static class PointOfEntry
     {
+        //DONE
         public static void Run()
         {
             List<string> options = new List<string>() { "Hello welcome to the Humane Society! Are you a(n):", "1. Employee", "2. Customer" };

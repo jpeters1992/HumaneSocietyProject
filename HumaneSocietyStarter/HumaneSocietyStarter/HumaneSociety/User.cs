@@ -8,6 +8,7 @@ namespace HumaneSociety
 {
     abstract class User
     {
+        //DONE
         protected string name;
         protected string userName;
 
