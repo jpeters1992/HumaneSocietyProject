@@ -189,7 +189,7 @@ namespace HumaneSociety
             }
         }
 
-        // TODO: Animal CRUD Operations
+        //Animal CRUD Operations
         internal static void AddAnimal(Animal animal)
         {
             db.Animals.InsertOnSubmit(animal);
@@ -198,7 +198,7 @@ namespace HumaneSociety
 
         internal static Animal GetAnimalByID(int id)
         {
-            return db.Animals.Where(a => a.AnimalId == id).SingleOrDefault();
+            return db.Animals.Where(a => a.AnimalId == id).FirstOrDefault();
         }
 
         internal static void UpdateAnimal(int animalId, Dictionary<int, string> updates)
@@ -304,7 +304,6 @@ namespace HumaneSociety
         //Adoption CRUD Operations
         internal static void Adopt(Animal animal, Client client)
         {
-            //double check
             Adoption adoption = new Adoption();
             animal.AdoptionStatus = "pending";
             adoption.AnimalId = animal.AnimalId;
@@ -335,19 +334,28 @@ namespace HumaneSociety
 
         internal static void RemoveAdoption(int animalId, int clientId)
         {
-            throw new NotImplementedException();
+            Adoption adoption = db.Adoptions.Where(a => a.AnimalId == animalId && a.ClientId == clientId).SingleOrDefault();
+
+            db.Adoptions.DeleteOnSubmit(adoption);
+            db.SubmitChanges();
         }
 
         //Shots Stuff
         internal static IQueryable<AnimalShot> GetShots(Animal animal)
         {
-            return db.AnimalShots.Where(ashot => ashot.AnimalId == animal.AnimalId);
+            return db.AnimalShots.Where(aS => aS.AnimalId == animal.AnimalId);
         }
 
         internal static void UpdateShot(string shotName, Animal animal)
         {
-            //TODO
-            throw new NotImplementedException();
+            AnimalShot updatedShots = new AnimalShot();
+
+            updatedShots.AnimalId = animal.AnimalId;
+            updatedShots.ShotId = db.Shots.Where(s => s.Name == shotName).Select(s => s.ShotId).SingleOrDefault();
+            updatedShots.DateReceived = DateTime.Now;
+
+            db.AnimalShots.InsertOnSubmit(updatedShots);
+            db.SubmitChanges();
         }
     }
 }
