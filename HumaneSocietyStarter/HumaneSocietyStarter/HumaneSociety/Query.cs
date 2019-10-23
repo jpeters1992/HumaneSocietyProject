@@ -242,7 +242,7 @@ namespace HumaneSociety
 
         internal static void RemoveAnimal(Animal animal)
         {
-            //still unsure
+            //double check
             db.Animals.DeleteOnSubmit(animal);
             db.SubmitChanges();
         }
@@ -301,20 +301,36 @@ namespace HumaneSociety
             return db.DietPlans.Where(d => d.Name == dietPlanName).SingleOrDefault().DietPlanId;
         }
 
-        // TODO: Adoption CRUD Operations
+        //Adoption CRUD Operations
         internal static void Adopt(Animal animal, Client client)
         {
-            throw new NotImplementedException();
+            //double check
+            Adoption adoption = new Adoption();
+            animal.AdoptionStatus = "pending";
+            adoption.AnimalId = animal.AnimalId;
+            adoption.ClientId = client.ClientId;
+            db.Adoptions.InsertOnSubmit(adoption);
+            db.SubmitChanges();
         }
 
         internal static IQueryable<Adoption> GetPendingAdoptions()
         {
-            throw new NotImplementedException();
+            return db.Adoptions.Where(a => a.ApprovalStatus == "pending");
         }
 
         internal static void UpdateAdoption(bool isAdopted, Adoption adoption)
         {
-            throw new NotImplementedException();
+            if (isAdopted)
+            {
+                adoption.ApprovalStatus = "Approved";
+
+                db.SubmitChanges();
+            }
+            else
+            {
+                adoption.ApprovalStatus = "Denied";
+                RemoveAdoption(adoption.AnimalId, adoption.ClientId);
+            }
         }
 
         internal static void RemoveAdoption(int animalId, int clientId)
@@ -322,14 +338,15 @@ namespace HumaneSociety
             throw new NotImplementedException();
         }
 
-        // TODO: Shots Stuff
+        //Shots Stuff
         internal static IQueryable<AnimalShot> GetShots(Animal animal)
         {
-            throw new NotImplementedException();
+            return db.AnimalShots.Where(ashot => ashot.AnimalId == animal.AnimalId);
         }
 
         internal static void UpdateShot(string shotName, Animal animal)
         {
+            //TODO
             throw new NotImplementedException();
         }
     }
