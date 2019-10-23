@@ -159,10 +159,7 @@ namespace HumaneSociety
             return employeeWithUserName == null;
         }
 
-
-        //// TODO Items: ////
-        
-        // TODO: Allow any of the CRUD operations to occur here
+       //Allow any of the CRUD operations to occur here
         internal static void RunEmployeeQueries(Employee employee, string crudOperation)
         {
             switch (crudOperation)
@@ -205,8 +202,42 @@ namespace HumaneSociety
         }
 
         internal static void UpdateAnimal(int animalId, Dictionary<int, string> updates)
-        {            
-            throw new NotImplementedException();
+        {
+            Animal animal = GetAnimalByID(animalId);
+            foreach (KeyValuePair<int, string> submission in updates)
+            {
+                switch (submission.Key)
+                {
+                    case 1:
+                        animal.CategoryId = GetCategoryId(submission.Value);
+                        return;
+                    case 2:
+                        animal.Name = submission.Value;
+                        return;
+                    case 3:
+                        animal.Age = Convert.ToInt32(submission.Value);
+                        return;
+                    case 4:
+                        animal.Demeanor = submission.Value;
+                        return;
+                    case 5:
+                        animal.KidFriendly = Convert.ToBoolean(submission.Value);
+                        return;
+                    case 6:
+                        animal.PetFriendly = Convert.ToBoolean(submission.Value);
+                        return;
+                    case 7:
+                        animal.Weight = Convert.ToInt32(submission.Value);
+                        return;
+                    case 8:
+                        animal.AnimalId = Convert.ToInt32(submission.Value);
+                        return;
+                    default:
+                        return;
+                }
+            }
+            db.Animals.InsertOnSubmit(animal);
+            db.SubmitChanges();
         }
 
         internal static void RemoveAnimal(Animal animal)
@@ -214,10 +245,42 @@ namespace HumaneSociety
             throw new NotImplementedException();
         }
         
-        // TODO: Animal Multi-Trait Search
+        //Animal Multi-Trait Search
         internal static IQueryable<Animal> SearchForAnimalsByMultipleTraits(Dictionary<int, string> updates) // parameter(s)?
         {
-            throw new NotImplementedException();
+            IQueryable<Animal> animalMultiTraitSearchList = db.Animals;
+
+            foreach (KeyValuePair<int, string> submission in updates)
+            {
+                switch (submission.Key)
+                {
+                    case 1:
+                        animalMultiTraitSearchList = animalMultiTraitSearchList.Where(a => a.CategoryId == GetCategoryId(submission.Value));
+                        break;
+                    case 2:
+                        animalMultiTraitSearchList = animalMultiTraitSearchList.Where(a => a.Name == submission.Value);
+                        break;
+                    case 3:
+                        animalMultiTraitSearchList = animalMultiTraitSearchList.Where(a => a.Age == Convert.ToInt32(submission.Value));
+                        break;
+                    case 4:
+                        animalMultiTraitSearchList = animalMultiTraitSearchList.Where(a => a.Demeanor == submission.Value);
+                        break;
+                    case 5:
+                        animalMultiTraitSearchList = animalMultiTraitSearchList.Where(a => a.KidFriendly == Convert.ToBoolean(submission.Value));
+                        break;
+                    case 6:
+                        animalMultiTraitSearchList = animalMultiTraitSearchList.Where(a => a.PetFriendly == Convert.ToBoolean(submission.Value));
+                        break;
+                    case 7:
+                        animalMultiTraitSearchList = animalMultiTraitSearchList.Where(a => a.Weight == Convert.ToInt32(submission.Value));
+                        break;
+                    case 8:
+                        animalMultiTraitSearchList = animalMultiTraitSearchList.Where(a => a.AnimalId == Convert.ToInt32(submission.Value));
+                        break;
+                }
+            }
+            return animalMultiTraitSearchList;
         }
          
         // TODO: Misc Animal Things
