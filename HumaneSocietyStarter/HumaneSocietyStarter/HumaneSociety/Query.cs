@@ -242,8 +242,9 @@ namespace HumaneSociety
 
         internal static void RemoveAnimal(Animal animal)
         {
-            //next
-            throw new NotImplementedException();
+            //still unsure
+            db.Animals.DeleteOnSubmit(animal);
+            db.SubmitChanges();
         }
         
         //Animal Multi-Trait Search
@@ -284,20 +285,20 @@ namespace HumaneSociety
             return animalMultiTraitSearchList;
         }
          
-        // TODO: Misc Animal Things
+        //Misc Animal Things
         internal static int GetCategoryId(string categoryName)
         {
-            throw new NotImplementedException();
+            return db.Categories.Where(c => c.Name == categoryName).SingleOrDefault().CategoryId;
         }
         
         internal static Room GetRoom(int animalId)
         {
-            throw new NotImplementedException();
+            return db.Rooms.Where(r => r.AnimalId == animalId).SingleOrDefault();
         }
         
         internal static int GetDietPlanId(string dietPlanName)
         {
-            throw new NotImplementedException();
+            return db.DietPlans.Where(d => d.Name == dietPlanName).SingleOrDefault().DietPlanId;
         }
 
         // TODO: Adoption CRUD Operations
