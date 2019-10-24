@@ -175,8 +175,7 @@ namespace HumaneSociety
                     Employee updatedEmployee = db.Employees.Where(e => e.EmployeeId == employee.EmployeeId).Single();
                     updatedEmployee.FirstName = employee.FirstName;
                     updatedEmployee.LastName = employee.LastName;
-                    updatedEmployee.UserName = employee.UserName;
-                    updatedEmployee.Password = employee.Password;
+                    updatedEmployee.EmployeeNumber = employee.EmployeeNumber;
                     updatedEmployee.Email = employee.Email;
                     db.SubmitChanges();
                     break;
@@ -198,7 +197,7 @@ namespace HumaneSociety
 
         internal static Animal GetAnimalByID(int id)
         {
-            return db.Animals.Where(a => a.AnimalId == id).FirstOrDefault();
+            return db.Animals.Where(e => e.AnimalId == id).FirstOrDefault();
         }
 
         internal static void UpdateAnimal(int animalId, Dictionary<int, string> updates)
@@ -242,72 +241,74 @@ namespace HumaneSociety
 
         internal static void RemoveAnimal(Animal animal)
         {
-            Animal animalRemoval = db.Animals.Where(a => a.AnimalId == animal.AnimalId).FirstOrDefault();
-            db.Animals.DeleteOnSubmit(animalRemoval);
+            db.Animals.DeleteOnSubmit(animal);
             db.SubmitChanges();
         }
         
         //Animal Multi-Trait Search
         internal static IQueryable<Animal> SearchForAnimalsByMultipleTraits(Dictionary<int, string> updates) // parameter(s)?
         {
-            IQueryable<Animal> animalMultiTraitSearchList = db.Animals;
+            IQueryable<Animal> animals = db.Animals;
 
-            foreach (KeyValuePair<int, string> submission in updates)
+            foreach (KeyValuePair<int, string> item in updates)
             {
-                switch (submission.Key)
+                switch (item.Key)
                 {
                     case 1:
-                        animalMultiTraitSearchList = animalMultiTraitSearchList.Where(a => a.CategoryId == GetCategoryId(submission.Value));
+                        animals = animals.Where(a => a.CategoryId == GetCategoryId(item.Value));
                         break;
                     case 2:
-                        animalMultiTraitSearchList = animalMultiTraitSearchList.Where(a => a.Name == submission.Value);
+                        animals = animals.Where(a => a.Name == item.Value);
                         break;
                     case 3:
-                        animalMultiTraitSearchList = animalMultiTraitSearchList.Where(a => a.Age == Convert.ToInt32(submission.Value));
+                        animals = animals.Where(a => a.Age == Convert.ToInt32(item.Value));
                         break;
                     case 4:
-                        animalMultiTraitSearchList = animalMultiTraitSearchList.Where(a => a.Demeanor == submission.Value);
+                        animals = animals.Where(a => a.Demeanor == item.Value);
                         break;
                     case 5:
-                        animalMultiTraitSearchList = animalMultiTraitSearchList.Where(a => a.KidFriendly == Convert.ToBoolean(submission.Value));
+                        animals = animals.Where(a => a.KidFriendly == Convert.ToBoolean(item.Value));
                         break;
                     case 6:
-                        animalMultiTraitSearchList = animalMultiTraitSearchList.Where(a => a.PetFriendly == Convert.ToBoolean(submission.Value));
+                        animals = animals.Where(a => a.PetFriendly == Convert.ToBoolean(item.Value));
                         break;
                     case 7:
-                        animalMultiTraitSearchList = animalMultiTraitSearchList.Where(a => a.Weight == Convert.ToInt32(submission.Value));
+                        animals = animals.Where(a => a.Weight == Convert.ToInt32(item.Value));
                         break;
                     case 8:
-                        animalMultiTraitSearchList = animalMultiTraitSearchList.Where(a => a.AnimalId == Convert.ToInt32(submission.Value));
+                        animals = animals.Where(a => a.AnimalId == Convert.ToInt32(item.Value));
                         break;
                 }
             }
-            return animalMultiTraitSearchList;
+            return animals;
         }
          
         //Misc Animal Things
         internal static int GetCategoryId(string categoryName)
         {
-            return db.Categories.Where(c => c.Name == categoryName).SingleOrDefault().CategoryId;
+            return db.Categories.Where(c => c.Name == categoryName).Select(c => c.CategoryId).FirstOrDefault();
         }
         
         internal static Room GetRoom(int animalId)
         {
-            return db.Rooms.Where(r => r.AnimalId == animalId).SingleOrDefault();
-        }
+            return db.Rooms.Where(r => r.AnimalId == animalId).FirstOrDefault();
+        } 
         
         internal static int GetDietPlanId(string dietPlanName)
         {
-            return db.DietPlans.Where(d => d.Name == dietPlanName).SingleOrDefault().DietPlanId;
+            return db.DietPlans.Where(p => p.Name == dietPlanName).Select(p => p.DietPlanId).FirstOrDefault();
         }
 
-        //Adoption CRUD Operations
+        //Adoption CRUD Operation
         internal static void Adopt(Animal animal, Client client)
         {
             Adoption adoption = new Adoption();
-            animal.AdoptionStatus = "pending";
+            adoption.ApprovalStatus = "pending";
             adoption.AnimalId = animal.AnimalId;
             adoption.ClientId = client.ClientId;
+            adoption.AdoptionFee = 25;
+            adoption.PaymentCollected = false;
+
             db.Adoptions.InsertOnSubmit(adoption);
             db.SubmitChanges();
         }
@@ -319,6 +320,7 @@ namespace HumaneSociety
 
         internal static void UpdateAdoption(bool isAdopted, Adoption adoption)
         {
+            //use ternary instead?
             if (isAdopted)
             {
                 adoption.ApprovalStatus = "Approved";
@@ -348,13 +350,13 @@ namespace HumaneSociety
 
         internal static void UpdateShot(string shotName, Animal animal)
         {
-            AnimalShot updatedShots = new AnimalShot();
+            AnimalShot newShots = new AnimalShot();
 
-            updatedShots.AnimalId = animal.AnimalId;
-            updatedShots.ShotId = db.Shots.Where(s => s.Name == shotName).Select(s => s.ShotId).SingleOrDefault();
-            updatedShots.DateReceived = DateTime.Now;
+            newShots.AnimalId = animal.AnimalId;
+            newShots.ShotId = db.Shots.Where(s => s.Name == shotName).Select(s => s.ShotId).SingleOrDefault();
+            newShots.DateReceived = DateTime.Now;
 
-            db.AnimalShots.InsertOnSubmit(updatedShots);
+            db.AnimalShots.InsertOnSubmit(newShots);
             db.SubmitChanges();
         }
     }
